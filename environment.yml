@@ -1,4 +1,4 @@
-name: ferconda
+name: fer
 channels:
   - pytorch
   - defaults
@@ -58,4 +58,4 @@ dependencies:
   - xz=5.2.5=h62dcd97_0
   - zlib=1.2.11=h62dcd97_4
   - zstd=1.4.9=h19a0ad4_0
-prefix: C:\Users\Yousef\anaconda3\envs\fer
+prefix: C:\Users\Lin\anaconda3\envs\fer

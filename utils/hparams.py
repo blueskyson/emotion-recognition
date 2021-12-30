@@ -10,7 +10,7 @@ hps = {
     'lr': 0.01,  # starting learning rate
     'save_freq': 20,  # how often to create checkpoints
     'drop': 0.1,
-    'bs': 64,
+    'bs': 16,
 }
 
 possible_nets = set(filename.split(".")[0] for filename in os.listdir('models'))
