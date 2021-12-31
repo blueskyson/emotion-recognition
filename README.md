@@ -10,6 +10,8 @@ And we use the code from [atulapra/Emotion-detection](https://github.com/atulapr
 
 Please see [README](./application/README.md) of application for more information.
 
+Our platform is i7-10750H with RTX2060 (6G). Our environment is python 3.7.12 on pyenv with virtualenv on Ubuntu 20.04. Required packages are listed in `requirements.txt`. The environment of `environment.yml` for anacoda3 on Windows 10 works fine as well.
+
 ---
 
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/facial-emotion-recognition-state-of-the-art/facial-expression-recognition-on-fer2013)](https://paperswithcode.com/sota/facial-expression-recognition-on-fer2013?p=facial-emotion-recognition-state-of-the-art)
@@ -17,6 +19,7 @@ Please see [README](./application/README.md) of application for more information
 This work is published on [arXiv](https://arxiv.org/abs/2105.03588)
 
 Our final model checkpoint can be found [here](https://drive.google.com/file/d/1uXGMXRk09r1ZQGFFEcoKXLKZHuaXDtNT/view?usp=sharing)
+
 ### Overview
 In this work, we achieve the highest single-network classification accuracy on FER2013. We adopt the VGGNet architecture, rigorously fine-tune its hyperparameters, and experiment with various optimization methods. To our best knowledge, our model achieves state-of-the-art single-network accuracy of 73.28 % on FER2013 without using extra training data.
 
@@ -45,9 +48,6 @@ To use this repo, create a conda environment using `environment.yml` or `require
 ```
 # from environment.yml (recommended)
 conda env create -f environment.yml
-
-# from requirements.txt
-conda create --name <env> --file requirements.txt
 ```
 Download the offical [fer2013](https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data) dataset, and place it in the outmost folder with the following folder structure `datasets/fer2013/fer2013.csv`
 
