@@ -1,5 +1,17 @@
 ## Facial Emotion Recognition (FER)
 
+This is a fork of [usef-kh/fer](https://github.com/usef-kh/fer). We made an application for detecting user-provided human face image.
+
+![](images/app1.png)
+
+And we use the code from [atulapra/Emotion-detection](https://github.com/atulapra/Emotion-detection) to implement a real-time camera emotion detector.
+
+![](images/app2.png)
+
+Please see [README](./application/README.md) of application for more information.
+
+---
+
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/facial-emotion-recognition-state-of-the-art/facial-expression-recognition-on-fer2013)](https://paperswithcode.com/sota/facial-expression-recognition-on-fer2013?p=facial-emotion-recognition-state-of-the-art)
 
 This work is published on [arXiv](https://arxiv.org/abs/2105.03588)

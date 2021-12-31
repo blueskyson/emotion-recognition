@@ -9,5 +9,7 @@ outputs/
 *.csv
 
 application/saliency.png
+application/__pycache__/
+application/images
 notebooks/MYVGG
 application/MYVGG
