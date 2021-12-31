@@ -7,4 +7,7 @@ outputs/
 
 *.sh
 *.csv
+
+application/saliency.png
 notebooks/MYVGG
+application/MYVGG

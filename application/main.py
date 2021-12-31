@@ -40,25 +40,27 @@ class MainWindow(QWidget):
         button[1].clicked.connect(self.test_random_image)
         button[2] = QPushButton("Test image", self)
         button[2].clicked.connect(self.test_image)
+        button[3] = QPushButton("Real-time camera detect", self)
+        button[3].clicked.connect(self.camera_detect)
 
         vbox = QVBoxLayout()
         vbox.addWidget(button[0])
         vbox.addWidget(self.model_label)
         vbox.addWidget(button[1])
         vbox.addWidget(button[2])
+        vbox.addWidget(button[3])
         vbox.addStretch(1)
         self.setLayout(vbox)
 
         self.net = None
         print("loading data...")
-        (
-            self.trainloader,
+        (   self.trainloader,
             self.valloader,
             self.testloader,
             self.emotion_mapping,
         ) = get_dataloaders(bs=1)
 
-    # button 0
+    # Button 0
     def load_model(self):
         dlg = QFileDialog()
         dlg.setFileMode(QFileDialog.AnyFile)
@@ -75,6 +77,7 @@ class MainWindow(QWidget):
         self.net.load_state_dict(checkpoint["params"])
         self.net.eval()
 
+    # Button 1
     def test_random_image(self):
         # get image from trainloader
         image, label = next(iter(self.testloader))
@@ -124,6 +127,7 @@ class MainWindow(QWidget):
         plt.savefig("saliency.png", bbox_inches="tight")
         plt.show()
 
+    # Button 2
     def test_image(self):
         dlg = QFileDialog()
         dlg.setFileMode(QFileDialog.AnyFile)
@@ -138,55 +142,95 @@ class MainWindow(QWidget):
         facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
         faces = facecasc.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
         for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
+            haar_img = cv2.rectangle(img.copy(), (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
             crop_gray = gray[y:y + h, x:x + w]
-            pil = Image.fromarray(crop_gray)
-            image = custom_imageloader(pil)
-            # image_plt = torch.squeeze(image)
+            dataloader = custom_imageloader(crop_gray)
+            image, _ = next(iter(dataloader))
+            image_plt = torch.squeeze(image)
 
-            # # activate gradients for input image
-            # image = image.to(device)
-            # image.requires_grad_()
+            # activate gradients for input image
+            image = image.to(device)
+            image.requires_grad_()
 
-            # # get prediction and score
-            # output = self.net(image)
-            # prediction = output.argmax()
-            # output_max = output[0, prediction]
+            # get prediction and score
+            output = self.net(image)
+            prediction = output.argmax()
+            output_max = output[0, prediction]
 
-            # # backprop score
-            # output_max.backward()
+            # backprop score
+            output_max.backward()
 
-            # # calculate saliency, rescale between 0 and 1
-            # saliency, _ = torch.max(image.grad.data.abs(), dim=1)
-            # saliency = saliency.reshape(40, 40)
-            # saliency -= saliency.min(1, keepdim=True)[0]
-            # saliency /= saliency.max(1, keepdim=True)[0]
+            # calculate saliency, rescale between 0 and 1
+            saliency, _ = torch.max(image.grad.data.abs(), dim=1)
+            saliency = saliency.reshape(40, 40)
+            saliency -= saliency.min(1, keepdim=True)[0]
+            saliency /= saliency.max(1, keepdim=True)[0]
 
-            # # draw picture
-            # fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
-            # plt.tight_layout()
+            # draw picture
+            fig, axs = plt.subplots(nrows=1, ncols=4, figsize=(15, 5))
+            plt.tight_layout()
 
-            # axs[0].set_title("Image", fontsize=18)
-            # axs[0].imshow(image_plt, cmap="gray")
-            # axs[0].axis("off")
+            axs[0].set_title("Detect Face", fontsize=18)
+            axs[0].imshow(cv2.cvtColor(haar_img, cv2.COLOR_BGR2RGB))
+            axs[0].axis("off")
 
-            # axs[1].set_title("Saliency Map", fontsize=18)
-            # im = axs[1].imshow(saliency.cpu(), cmap="Blues")
-            # axs[1].axis("off")
+            axs[1].set_title("Crop Image", fontsize=18)
+            axs[1].imshow(image_plt, cmap="gray")
+            axs[1].axis("off")
 
-            # pred_str = self.emotion_mapping[prediction.item()]
-            # axs[2].set_title("Predict: " + pred_str, fontsize=18)
-            # axs[2].imshow(image_plt, cmap="gray")
-            # axs[2].imshow(saliency.cpu(), cmap="Blues", alpha=0.4)
-            # axs[2].axis("off")
+            axs[2].set_title("Saliency Map", fontsize=18)
+            im = axs[2].imshow(saliency.cpu(), cmap="Blues")
+            axs[2].axis("off")
 
-            # cbar = fig.colorbar(im, ax=axs.ravel().tolist())
-            # for t in cbar.ax.get_yticklabels():
-            #     t.set_fontsize(12)
+            pred_str = self.emotion_mapping[prediction.item()]
+            axs[3].set_title("Predict: " + pred_str, fontsize=18)
+            axs[3].imshow(image_plt, cmap="gray")
+            axs[3].imshow(saliency.cpu(), cmap="Blues", alpha=0.4)
+            axs[3].axis("off")
 
-            # plt.savefig("saliency.png", bbox_inches="tight")
-            # plt.show()   
+            cbar = fig.colorbar(im, ax=axs.ravel().tolist())
+            for t in cbar.ax.get_yticklabels():
+                t.set_fontsize(12)
 
+            plt.savefig("saliency.png", bbox_inches="tight")
+            plt.show()
+    
+    # Button 3
+    def camera_detect(self):
+        # prevents openCL usage and unnecessary logging messages
+        cv2.ocl.setUseOpenCL(False)
+        
+        # start the webcam feed
+        cap = cv2.VideoCapture(0)
+        
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            facecasc = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            faces = facecasc.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
+            for (x, y, w, h) in faces:
+                cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
+                crop_gray = gray[y:y + h, x:x + w]
+                dataloader = custom_imageloader(crop_gray)
+                image, _ = next(iter(dataloader))
+
+                # activate gradients for input image
+                image = image.to(device)
+                image.requires_grad_()
+
+                # get prediction and score
+                output = self.net(image)
+                prediction = output.argmax()
+                pred_str = self.emotion_mapping[prediction.item()]
+                cv2.putText(frame, pred_str, (x+20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
+            
+            cv2.imshow('Video', cv2.resize(frame, (1600,960), interpolation = cv2.INTER_CUBIC))
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        cap.release()
+        cv2.destroyAllWindows()
 
 def main():
     app = QApplication(sys.argv)

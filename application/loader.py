@@ -78,7 +78,6 @@ def get_dataloaders(path="fer2013.csv", bs=16):
     fer2013, emotion_mapping = load_data(path)
 
     xtrain, ytrain = prepare_data(fer2013[fer2013["Usage"] == "Training"])
-    print(xtrain[0])
     xval, yval = prepare_data(fer2013[fer2013["Usage"] == "PrivateTest"])
     xtest, ytest = prepare_data(fer2013[fer2013["Usage"] == "PublicTest"])
 
@@ -101,14 +100,19 @@ def get_dataloaders(path="fer2013.csv", bs=16):
 
     return trainloader, valloader, testloader, emotion_mapping
 
-def custom_imageloader(orig_img):
+def custom_imageloader(xtest):
+    height = xtest.shape[0]
+    width = xtest.shape[1]
+    image_array = np.zeros(shape=(1, height, width))
+    image_array[0] = xtest
     mu, st = 0, 255
     test_transform = transforms.Compose(
         [
             transforms.Resize(40),
             transforms.ToTensor(),
-            #transforms.Normalize(mean=(mu,), std=(st,)),
+            transforms.Normalize(mean=(mu,), std=(st,)),
         ]
     )
-    img = test_transform(orig_img)
-    return img
+    test = CustomDataset(image_array, [-1], test_transform)
+    testloader = DataLoader(test, batch_size=1, shuffle=True, num_workers=0)
+    return testloader
