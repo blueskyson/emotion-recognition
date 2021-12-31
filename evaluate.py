@@ -78,10 +78,10 @@ def evaluate(net, dataloader, criterion):
     print("Top 1 Accuracy: %2.6f %%" % acc1)
     print("Top 2 Accuracy: %2.6f %%" % acc2)
     print("Loss: %2.6f" % loss)
-    print("Precision: %2.6f" % precision_score(y_gt, y_pred, average='micro'))
-    print("Recall: %2.6f" % recall_score(y_gt, y_pred, average='micro'))
-    print("F1 Score: %2.6f" % f1_score(y_gt, y_pred, average='micro'))
-    print("Confusion Matrix:\n", confusion_matrix(y_gt, y_pred), '\n')
+    print("Precision: %2.6f" % precision_score(y_gt, y_pred, average="micro"))
+    print("Recall: %2.6f" % recall_score(y_gt, y_pred, average="micro"))
+    print("F1 Score: %2.6f" % f1_score(y_gt, y_pred, average="micro"))
+    print("Confusion Matrix:\n", confusion_matrix(y_gt, y_pred), "\n")
 
 
 if __name__ == "__main__":

@@ -44,6 +44,6 @@ Download the offical [fer2013](https://www.kaggle.com/c/challenges-in-representa
 To train your own version of our network, run the following
 
 ```
-python train.py network=vgg name=my_vgg
+python train.py network=vgg name=vgg_test
 ```
 To change the default parameters, you may also add arguments such as `bs=128` or `lr=0.1`. For more details, please refer to `utils/hparams.py`

@@ -1,9 +1,8 @@
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision
 
 
-class VggFeatures(nn.Module):
+class Vgg(nn.Module):
     def __init__(self, drop=0.2):
         super().__init__()
 
@@ -38,6 +37,8 @@ class VggFeatures(nn.Module):
         self.lin1 = nn.Linear(512 * 2 * 2, 4096)
         self.lin2 = nn.Linear(4096, 4096)
 
+        self.lin3 = nn.Linear(4096, 7)
+
         self.drop = nn.Dropout(p=drop)
 
     def forward(self, x):
@@ -56,21 +57,10 @@ class VggFeatures(nn.Module):
         x = F.relu(self.bn4a(self.conv4a(x)))
         x = F.relu(self.bn4b(self.conv4b(x)))
         x = self.pool(x)
-        # print(x.shape)
 
         x = x.view(-1, 512 * 2 * 2)
         x = F.relu(self.drop(self.lin1(x)))
         x = F.relu(self.drop(self.lin2(x)))
-
-        return x
-
-
-class Vgg(VggFeatures):
-    def __init__(self, drop=0.2):
-        super().__init__(drop)
-        self.lin3 = nn.Linear(4096, 7)
-
-    def forward(self, x):
-        x = super().forward(x)
         x = self.lin3(x)
+
         return x

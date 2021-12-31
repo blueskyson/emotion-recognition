@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from data.dataset import CustomDataset
 
 
-def load_data(path='datasets/ckplus'):
+def load_data(path="datasets/ckplus"):
     """ prepare all image paths and their corresponding emotions. Group all images by subject.
 
         the dataset is slightly odd such that each subject has ~3 identical images.
@@ -57,8 +57,12 @@ def prepare_data(data):
     i = 0
     for emotion, img_paths in data.items():
         for path in img_paths:
-            image_array[i] = np.array(Image.open(path))  # load image from path into numpy array
-            image_label[i] = emotion_mapping[emotion]  # convert emotion to its emotion id
+            image_array[i] = np.array(
+                Image.open(path)
+            )  # load image from path into numpy array
+            image_label[i] = emotion_mapping[
+                emotion
+            ]  # convert emotion to its emotion id
             i += 1
 
     return image_array, image_label
@@ -76,8 +80,12 @@ def split_data(data):
     for emotion, subjects in data.items():
 
         # shuffle each emotion's subjects and split them using a 0.8, 0.2, 0.2 split
-        subjects_train, subjects_test = train_test_split(list(subjects.keys()), test_size=0.2, random_state=1, shuffle=True)
-        subjects_train, subjects_val = train_test_split(subjects_train, test_size=0.25, random_state=1, shuffle=True)  # 0.25 * 0.8 = 0.2
+        subjects_train, subjects_test = train_test_split(
+            list(subjects.keys()), test_size=0.2, random_state=1, shuffle=True
+        )
+        subjects_train, subjects_val = train_test_split(
+            subjects_train, test_size=0.25, random_state=1, shuffle=True
+        )  # 0.25 * 0.8 = 0.2
 
         for subject in subjects_train:
             train[emotion].extend(subjects[subject])
@@ -91,7 +99,7 @@ def split_data(data):
     return train, val, test
 
 
-def get_dataloaders(path='datasets/ckplus'):
+def get_dataloaders(path="datasets/ckplus"):
     ckplus = load_data(path)
     train, val, test = split_data(ckplus)
 
@@ -100,19 +108,22 @@ def get_dataloaders(path='datasets/ckplus'):
     xtest, ytest = prepare_data(test)
 
     mu, st = 0, 1
-    train_transform = transforms.Compose([
-        transforms.RandomResizedCrop(48, scale=(0.8, 1.2)),
-        transforms.RandomApply([transforms.RandomAffine(0, translate=(0.2, 0.2))], p=0.5),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomApply([transforms.RandomRotation(10)], p=0.5),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=(mu,), std=(st,))
-    ])
+    train_transform = transforms.Compose(
+        [
+            transforms.RandomResizedCrop(48, scale=(0.8, 1.2)),
+            transforms.RandomApply(
+                [transforms.RandomAffine(0, translate=(0.2, 0.2))], p=0.5
+            ),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomApply([transforms.RandomRotation(10)], p=0.5),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=(mu,), std=(st,)),
+        ]
+    )
 
-    test_transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize(mean=(mu,), std=(st,))
-    ])
+    test_transform = transforms.Compose(
+        [transforms.ToTensor(), transforms.Normalize(mean=(mu,), std=(st,))]
+    )
 
     train = CustomDataset(xtrain, ytrain, train_transform)
     val = CustomDataset(xval, yval, test_transform)
@@ -125,8 +136,8 @@ def get_dataloaders(path='datasets/ckplus'):
     return trainloader, valloader, testloader
 
 
-if __name__ == '__main__':
-    ckplus = load_data('../datasets/ckplus')
+if __name__ == "__main__":
+    ckplus = load_data("../datasets/ckplus")
 
     train, val, test = split_data(ckplus)
 
