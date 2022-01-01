@@ -113,7 +113,7 @@ def get_dataloaders(path="fer2013.csv", bs=16):
     valloader = DataLoader(val, batch_size=bs, shuffle=True, num_workers=0)
     testloader = DataLoader(test, batch_size=bs, shuffle=True, num_workers=0)
 
-    return trainloader, valloader, testloader, emotion_mapping, emotion_mapping2
+    return trainloader, valloader, testloader, emotion_mapping
 
 def get_dataloaders2(path="fer2013.csv", bs=16):
     """ Prepare train, val, & test dataloaders
@@ -149,7 +149,7 @@ def get_dataloaders2(path="fer2013.csv", bs=16):
     valloader = DataLoader(val, batch_size=bs, shuffle=True, num_workers=0)
     testloader = DataLoader(test, batch_size=bs, shuffle=True, num_workers=0)
 
-    return trainloader, valloader, testloader
+    return trainloader, valloader, testloader, emotion_mapping2
 
 
 def custom_imageloader(xtest):

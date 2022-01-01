@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import warnings
 from PyQt5.QtWidgets import (
@@ -14,11 +15,13 @@ from PyQt5.QtCore import Qt
 import torch
 import torchvision.transforms as transforms
 from vgg import Vgg
-from loader import get_dataloaders, custom_imageloader
+from loader import get_dataloaders2, custom_imageloader2
 import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
 import numpy as np
+import torchvision.models as models
+import resnet34
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 warnings.filterwarnings("ignore")
@@ -53,12 +56,10 @@ class MainWindow(QWidget):
         self.setLayout(vbox)
 
         self.net = None
-        print("loading data...")
-        (   self.trainloader,
-            self.valloader,
-            self.testloader,
-            self.emotion_mapping,
-        ) = get_dataloaders(bs=1)
+        (   self.trainloader2,
+            self.valloader2,
+            self.testloader2,
+        ) = get_dataloaders2(bs=1)
 
     # Button 0
     def load_model(self):
@@ -70,17 +71,18 @@ class MainWindow(QWidget):
             return
         filename = filenames[0]
         self.model_label.setText("Model: " + filename)
-
+        print(filename)
         # Load model
-        checkpoint = torch.load(filename)
-        self.net = Vgg().to(device)
-        self.net.load_state_dict(checkpoint["params"])
+        name_split = filename.split('/')
+        self.net_mode = 1
+        self.net = torch.load(filename)
+        self.net.to(device)
         self.net.eval()
 
     # Button 1
     def test_random_image(self):
         # get image from trainloader
-        image, label = next(iter(self.testloader))
+        image, label = next(iter(self.testloader2))
         image_plt = torch.squeeze(image)
 
         # activate gradients for input image
@@ -97,7 +99,7 @@ class MainWindow(QWidget):
 
         # calculate saliency, rescale between 0 and 1
         saliency, _ = torch.max(image.grad.data.abs(), dim=1)
-        saliency = saliency.reshape(40, 40)
+        saliency = saliency.reshape(48, 48)
         saliency -= saliency.min(1, keepdim=True)[0]
         saliency /= saliency.max(1, keepdim=True)[0]
 
@@ -113,8 +115,7 @@ class MainWindow(QWidget):
         axs[1].set_title("Saliency Map", fontsize=18)
         im = axs[1].imshow(saliency.cpu(), cmap="Blues")
         axs[1].axis("off")
-
-        pred_str = self.emotion_mapping[prediction.item()]
+        pred_str = self.emotion_mapping2[prediction.item()]
         axs[2].set_title("Predict: " + pred_str, fontsize=18)
         axs[2].imshow(image_plt, cmap="gray")
         axs[2].imshow(saliency.cpu(), cmap="Blues", alpha=0.4)
@@ -213,7 +214,7 @@ class MainWindow(QWidget):
             for (x, y, w, h) in faces:
                 cv2.rectangle(frame, (x, y-50), (x+w, y+h+10), (255, 0, 0), 2)
                 crop_gray = gray[y:y + h, x:x + w]
-                dataloader = custom_imageloader(crop_gray)
+                dataloader = custom_imageloader2(crop_gray)
                 image, _ = next(iter(dataloader))
 
                 # activate gradients for input image
@@ -223,7 +224,7 @@ class MainWindow(QWidget):
                 # get prediction and score
                 output = self.net(image)
                 prediction = output.argmax()
-                pred_str = self.emotion_mapping[prediction.item()]
+                pred_str = self.emotion_mapping2[prediction.item()]
                 cv2.putText(frame, pred_str, (x+20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA)
             
             cv2.imshow('Video', cv2.resize(frame, (1600,960), interpolation = cv2.INTER_CUBIC))
