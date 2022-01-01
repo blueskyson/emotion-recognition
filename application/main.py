@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import warnings
 from PyQt5.QtWidgets import (
@@ -19,6 +20,8 @@ import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
 import numpy as np
+import torchvision.models as models
+import resnet34
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 warnings.filterwarnings("ignore")
@@ -70,12 +73,19 @@ class MainWindow(QWidget):
             return
         filename = filenames[0]
         self.model_label.setText("Model: " + filename)
-
+        print(filename)
         # Load model
-        checkpoint = torch.load(filename)
-        self.net = Vgg().to(device)
-        self.net.load_state_dict(checkpoint["params"])
-        self.net.eval()
+        name_split = filename.split('/')
+        if name_split == 'MYVGG':
+            
+            checkpoint = torch.load(filename)
+            self.net = Vgg().to(device)
+            self.net.load_state_dict(checkpoint["params"])
+            self.net.eval()
+        else:
+            self.net = torch.load(filename)
+            self.net.to(device)
+            self.net.eval()
 
     # Button 1
     def test_random_image(self):
