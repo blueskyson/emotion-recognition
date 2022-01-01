@@ -76,7 +76,7 @@ class MainWindow(QWidget):
         print(filename)
         # Load model
         name_split = filename.split('/')
-        if name_split == 'MYVGG':
+        if name_split[-1] == 'MYVGG':
             
             checkpoint = torch.load(filename)
             self.net = Vgg().to(device)
