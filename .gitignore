@@ -13,3 +13,6 @@ application/__pycache__/
 application/images
 notebooks/MYVGG
 application/MYVGG
+
+train_*
+*.pth

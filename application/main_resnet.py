@@ -15,7 +15,7 @@ from PyQt5.QtCore import Qt
 import torch
 import torchvision.transforms as transforms
 from vgg import Vgg
-from loader import get_dataloaders2, custom_imageloader2
+from loader import get_dataloaders2, custom_imageloader2, custom_imageloader
 import matplotlib.pyplot as plt
 import cv2
 from PIL import Image
@@ -59,6 +59,7 @@ class MainWindow(QWidget):
         (   self.trainloader2,
             self.valloader2,
             self.testloader2,
+            self.emotion_mapping2
         ) = get_dataloaders2(bs=1)
 
     # Button 0
@@ -107,7 +108,7 @@ class MainWindow(QWidget):
         fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(15, 5))
         plt.tight_layout()
 
-        label_str = self.emotion_mapping[label.item()]
+        label_str = self.emotion_mapping2[label.item()]
         axs[0].set_title("Emotion: " + label_str, fontsize=18)
         axs[0].imshow(image_plt, cmap="gray")
         axs[0].axis("off")
@@ -183,7 +184,7 @@ class MainWindow(QWidget):
             im = axs[2].imshow(saliency.cpu(), cmap="Blues")
             axs[2].axis("off")
 
-            pred_str = self.emotion_mapping[prediction.item()]
+            pred_str = self.emotion_mapping2[prediction.item()]
             axs[3].set_title("Predict: " + pred_str, fontsize=18)
             axs[3].imshow(image_plt, cmap="gray")
             axs[3].imshow(saliency.cpu(), cmap="Blues", alpha=0.4)
