@@ -14,5 +14,5 @@ This is an simple GUI application based on pyQt5.
 # FER-2013 ResNet Application
 
 1. Download our pretrained ResNet34V2 [here](https://github.com/arthurchang09/fer/releases/tag/ResNet34v2).
-2. Run `python main_resnet.py` and select ResNet34V2 via the "Load model" button.
-3 - 5 are the same usage as the VGGNet application.
+2. Run `python main_resnet.py` and select ResNet34V2 via the "Load model" button.  
+3. to 5. are the same usage as the VGGNet application.
