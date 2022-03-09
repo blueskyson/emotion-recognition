@@ -7,6 +7,20 @@ This is a fork of [usef-kh/fer](https://github.com/usef-kh/fer). We made an appl
 And we use the code from [atulapra/Emotion-detection](https://github.com/atulapra/Emotion-detection) to implement a real-time camera emotion detector.
 
 ![](images/app2.png)
+To train:
+
+```
+$ python train.py network=vgg name=vgg_test
+```
+
+Or, download pretrained model "100-epoch-VGG" [here](https://github.com/blueskyson/fer/releases/tag/100-epoch-checkpoint).
+
+To execute:
+
+```
+$ cd application
+$ python main.py
+```
 
 Please see [README](./application/README.md) of application for more information.
 
